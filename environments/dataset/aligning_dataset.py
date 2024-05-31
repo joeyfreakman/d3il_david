@@ -44,7 +44,12 @@ class Aligning_Dataset(TrajectoryDataset):
         # data_dir = sim_framework_path(data_directory)
         # state_files = glob.glob(data_dir + "/env*")
 
-        rp_data_dir = sim_framework_path("environments/dataset/data/aligning/all_data/state")
+        # rp_data_dir = sim_framework_path("environments/dataset/data/aligning/all_data/state")
+
+        # rp_data_dir = "/home/david/CoRL_benchmark/CoRL_Benchmark/environments/dataset/data/robot_push/all_data/state"
+
+        rp_data_dir = "/hkfs/work/workspace/scratch/ll6323-david_dataset/d3il/robot_push/all_data/state"
+
         state_files = np.load(sim_framework_path(data_directory), allow_pickle=True)
 
         for file in state_files:

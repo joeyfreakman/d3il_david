@@ -38,8 +38,8 @@ train_batch_size: 1024
 val_batch_size: 1024
 num_workers: 4
 device: 'cuda'
-epoch: 500
-eval_every_n_epochs: 50
+epoch: 1
+eval_every_n_epochs: 1
 scale_data: True
 
 # Environment
@@ -70,7 +70,7 @@ simulation:
   _target_: simulation.aligning_sim.Aligning_Sim
   seed: ${seed}
   device: ${device}
-  render: False
-  n_cores: 30
-  n_contexts: 60
-  n_trajectories_per_context: 8
+  render: True
+  n_cores: 2
+  n_contexts: 2
+  n_trajectories_per_context: 1

@@ -172,7 +172,7 @@ class Block_Push_Env(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,
-        max_steps_per_episode: int = 400,
+        max_steps_per_episode: int = 500,
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
