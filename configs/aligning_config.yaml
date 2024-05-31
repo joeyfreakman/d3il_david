@@ -1,8 +1,8 @@
 defaults:
-  - agents: bc_agent
+  - agents: ddpm_mamba_only_agent
 #  - override hydra/launcher: submitit_slurm
 
-agent_name: bc
+agent_name: ddpm_mamba_only
 log_dir: logs/aligning/
 
 train_data_path: environments/dataset/data/aligning/train_files.pkl
@@ -33,6 +33,23 @@ n_layer: 4
 n_head: 4
 n_embd: 72
 
+n_layers: 8
+
+# mamba_ssm_config:
+mamba_ssm_cfg:
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
 # Training
 train_batch_size: 1024
 val_batch_size: 1024
@@ -46,7 +63,13 @@ scale_data: True
 obs_dim: 20
 action_dim: 3
 max_len_data: 512
-window_size: 1
+
+diff_steps: 16
+
+window_size: ${add:${obs_seq},3}
+obs_seq: 5
+train_action_seq: 4
+inference_action_seq: ${train_action_seq}
 
 # Dataset
 trainset:
