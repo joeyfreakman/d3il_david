@@ -26,7 +26,7 @@ hydra:
     #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
 
     # clusterduck specific options
-    parallel_runs_per_node: 6
+    parallel_runs_per_node: 8
     total_runs_per_node: null
     resources_config:
       cpu:

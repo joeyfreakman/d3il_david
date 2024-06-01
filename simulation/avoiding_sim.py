@@ -80,7 +80,7 @@ class Avoiding_Sim(BaseSim):
     # n_trajectories: rollout policy for n times
     # n_cores: the number of cores used for simulation
     ###############################
-    def test_agent(self, agent):
+    def test_agent(self, agent, assign_cpus=None):
 
         log.info('Starting trained model evaluation')
 
@@ -89,14 +89,14 @@ class Avoiding_Sim(BaseSim):
         mode_encoding = torch.zeros([self.n_trajectories, 9]).share_memory_()
         successes = torch.zeros(self.n_trajectories).share_memory_()
 
-        num_cpu = mp.cpu_count()
-        cpu_set = list(range(num_cpu))
+        # num_cpu = mp.cpu_count()
+        # cpu_set = list(range(num_cpu))
+        #
+        # start = self.seed * 20
+        # end = start + 20
 
-        start = self.seed * 20
-        end = start + 20
-
-        cpu_set = cpu_set[start:end]
-        print("there are cpus: ", num_cpu)
+        cpu_set = assign_cpus
+        print("there are cpus: ", cpu_set)
 
         ctx = mp.get_context('spawn')
 

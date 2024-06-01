@@ -90,7 +90,7 @@ class Pushing_Sim(BaseSim):
     # n_trajectories_per_context: test each context for n times, this is mostly used for multi-modal data
     # n_cores: the number of cores used for simulation
     ###############################
-    def test_agent(self, agent):
+    def test_agent(self, agent, assign_cpus=None):
 
         log.info('Starting trained model evaluation')
 
@@ -102,14 +102,17 @@ class Pushing_Sim(BaseSim):
 
         workload = self.n_contexts // self.n_cores
 
-        num_cpu = mp.cpu_count()
-        cpu_set = list(range(num_cpu))
+        # num_cpu = mp.cpu_count()
+        # cpu_set = list(range(num_cpu))
+        #
+        # start = self.seed * 20
+        # end = start + 20
+        #
+        # cpu_set = cpu_set[start:end]
+        # print("there are cpus: ", num_cpu)
 
-        start = self.seed * 20
-        end = start + 20
-
-        cpu_set = cpu_set[start:end]
-        print("there are cpus: ", num_cpu)
+        cpu_set = assign_cpus
+        print("there are cpus: ", cpu_set)
 
         ctx = mp.get_context('spawn')
 
