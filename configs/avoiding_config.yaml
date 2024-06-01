@@ -1,25 +1,48 @@
 defaults:
-  - agents: act_agent
-#  - override hydra/launcher: submitit_slurm
+  - agents: ddpm_mamba_only_agent
+  - override hydra/launcher: clusterduck_slurm
 
-agent_name: act
+agent_name: ddpm_mamba_only
 log_dir: logs/avoiding/
 
-data_directory: environments/dataset/data/avoiding/data
+#data_directory: /home/david/CoRL_benchmark/CoRL_Benchmark/environments/dataset/data/obstacle_avoidance/data
+
+data_directory: /hkfs/work/workspace/scratch/ll6323-david_dataset/d3il/obstacle_avoidance/data
 
 # insert wandb here
 wandb:
   entity: davidjia
-  project: d3il
+  project: d3il_mamba
 
 group: avoiding_${agent_name}
 
 hydra:
+  mode: MULTIRUN
   run:
     dir: ${log_dir}/runs/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: True
   sweep:
     dir: ${log_dir}/sweeps/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.override_dirname}
+  launcher:
+    timeout_min: 600
+    name: avoiding #${hydra.job.name}
+    partition: accelerated
+    gres: gpu:4
+    #    cpus-per-task: 152
+    #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
+
+    # clusterduck specific options
+    parallel_runs_per_node: 6
+    total_runs_per_node: null
+    resources_config:
+      cpu:
+      cuda:
+        gpus: [ 0, 1, 2, 3 ]
+      rendering:
+      stagger:
+        delay: 5
 
 seed: 42
 
@@ -32,20 +55,77 @@ n_layer: 4
 n_head: 4
 n_embd: 72
 
+n_layers: 8
+
+d_conv: 4
+n_layer_decoder: 6
+n_layer_encoder: 4
+
+# mamba_ssm_config:
+mamba_ssm_cfg:
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
+# mamba_ssm_config:
+mamba_encoder_cfg:
+  d_state: 16
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
+# mamba_ssm_config:
+mamba_decoder_cfg:
+  d_state: 16
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
 # Training
 train_batch_size: 1024
 val_batch_size: 1024
 num_workers: 4
 device: 'cuda'
-epoch: 1
-eval_every_n_epochs: 1
+epoch: 2000
+eval_every_n_epochs: 2000
 scale_data: True
 
 # Environment
 obs_dim: 4
 action_dim: 2
 max_len_data: 200
-window_size: 1
+
+diff_steps: 16
+
+window_size: ${add:${obs_seq},3}
+obs_seq: 5
+train_action_seq: 4
+inference_action_seq: ${train_action_seq}
 
 # Dataset
 trainset:
@@ -69,6 +149,6 @@ simulation:
   _target_: simulation.avoiding_sim.Avoiding_Sim
   seed: ${seed}
   device: ${device}
-  render: True
-  n_cores: 1
-  n_trajectories: 100
+  render: False
+  n_cores: 20
+  n_trajectories: 480

@@ -92,10 +92,10 @@ class Avoiding_Sim(BaseSim):
         num_cpu = mp.cpu_count()
         cpu_set = list(range(num_cpu))
 
-        # start = self.seed * 20
-        # end = start + 20
-        #
-        # cpu_set = cpu_set[start:end]
+        start = self.seed * 20
+        end = start + 20
+
+        cpu_set = cpu_set[start:end]
         print("there are cpus: ", num_cpu)
 
         ctx = mp.get_context('spawn')

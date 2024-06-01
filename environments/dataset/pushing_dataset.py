@@ -47,7 +47,11 @@ class Pushing_Dataset(TrajectoryDataset):
         # data_dir = sim_framework_path(data_directory)
         # state_files = glob.glob(data_dir + "/env*")
 
-        bp_data_dir = sim_framework_path("environments/dataset/data/pushing/all_data")
+        # bp_data_dir = sim_framework_path("environments/dataset/data/pushing/all_data")
+
+        # bp_data_dir = "/home/david/CoRL_benchmark/CoRL_Benchmark/environments/dataset/data/blockpush/all_data"
+
+        bp_data_dir = "/hkfs/work/workspace/scratch/ll6323-david_dataset/d3il/blockpush/all_data"
 
         state_files = np.load(sim_framework_path(data_directory), allow_pickle=True)
 

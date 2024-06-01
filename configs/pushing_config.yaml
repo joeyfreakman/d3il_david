@@ -1,8 +1,8 @@
 defaults:
-  - agents: bc_agent
-#  - override hydra/launcher: submitit_slurm
+  - agents: ddpm_mamba_only_agent
+  - override hydra/launcher: clusterduck_slurm
 
-agent_name: bc
+agent_name: ddpm_mamba_only
 log_dir: logs/pushing/
 
 train_data_path: environments/dataset/data/pushing/train_files.pkl
@@ -10,18 +10,38 @@ eval_data_path: environments/dataset/data/pushing/eval_files.pkl
 
 # insert wandb here
 wandb:
-  entity: atalaydonat
-  project: d3il-test
+  entity: davidjia
+  project: d3il_mamba
 
 group: pushing_${agent_name}_test
 
 hydra:
+  mode: MULTIRUN
   run:
     dir: ${log_dir}/runs/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: True
   sweep:
     dir: ${log_dir}/sweeps/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.override_dirname}
+  launcher:
+    timeout_min: 600
+    name: pushing #${hydra.job.name}
+    partition: accelerated
+    gres: gpu:4
+    #    cpus-per-task: 152
+    #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
 
+    # clusterduck specific options
+    parallel_runs_per_node: 6
+    total_runs_per_node: null
+    resources_config:
+      cpu:
+      cuda:
+        gpus: [ 0, 1, 2, 3 ]
+      rendering:
+      stagger:
+        delay: 5
 #  launcher:
 #    timeout_min: 2000
 #    name: pushing #${hydra.job.name}
@@ -41,20 +61,77 @@ n_layer: 4
 n_head: 4
 n_embd: 72
 
+n_layers: 8
+
+d_conv: 4
+n_layer_decoder: 6
+n_layer_encoder: 4
+
+# mamba_ssm_config:
+mamba_ssm_cfg:
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
+# mamba_ssm_config:
+mamba_encoder_cfg:
+  d_state: 8
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
+# mamba_ssm_config:
+mamba_decoder_cfg:
+  d_state: 8
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
 # Training
 train_batch_size: 1024
 val_batch_size: 1024
 num_workers: 4
-device: 'cpu'
-epoch: 4
-eval_every_n_epochs: 2
+device: 'cuda'
+epoch: 500
+eval_every_n_epochs: 50
 scale_data: True
 
 # Environment
 obs_dim: 10
 action_dim: 2
 max_len_data: 512
-window_size: 5
+
+diff_steps: 16
+
+window_size: ${add:${obs_seq},3}
+obs_seq: 5
+train_action_seq: 4
+inference_action_seq: ${train_action_seq}
 
 # Dataset
 trainset:
@@ -79,6 +156,6 @@ simulation:
   seed: ${seed}
   device: ${device}
   render: True
-  n_cores: 1
-  n_contexts: 1
-  n_trajectories_per_context: 8
+  n_cores: 10
+  n_contexts: 30
+  n_trajectories_per_context: 16

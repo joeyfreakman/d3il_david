@@ -19,7 +19,7 @@ OmegaConf.register_new_resolver(
 torch.cuda.empty_cache()
 
 
-@hydra.main(config_path="configs", config_name="avoiding_config.yaml")
+@hydra.main(config_path="configs", config_name="aligning_config.yaml")
 def main(cfg: DictConfig) -> None:
 
     np.random.seed(cfg.seed)
@@ -36,7 +36,9 @@ def main(cfg: DictConfig) -> None:
     )
 
     agent = hydra.utils.instantiate(cfg.agents)
-    
+
+    agent.load_pretrained_model("/home/david/Student/Wangqian/d3il_david/logs/", sv_name="eval_best_ddpm.pth")
+
     # TODO: insert agent.load_pretrained_model() here with relative path
 
     env_sim = hydra.utils.instantiate(cfg.simulation)

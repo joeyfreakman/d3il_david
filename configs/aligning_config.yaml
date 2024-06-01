@@ -1,19 +1,40 @@
 defaults:
   - agents: ddpm_mamba_cross_agent
-#  - override hydra/launcher: submitit_slurm
+  - override hydra/launcher: clusterduck_slurm
 
-agent_name: ddpm_mamba_cross
+agent_name: ddpm_mamba_only
 log_dir: logs/aligning/
 
 train_data_path: environments/dataset/data/aligning/train_files.pkl
 eval_data_path: environments/dataset/data/aligning/eval_files.pkl
 
 hydra:
+  mode: MULTIRUN
   run:
     dir: ${log_dir}/runs/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: True
   sweep:
     dir: ${log_dir}/sweeps/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.override_dirname}
+  launcher:
+    timeout_min: 600
+    name: aligning #${hydra.job.name}
+    partition: accelerated
+    gres: gpu:4
+    #    cpus-per-task: 152
+    #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
+
+    # clusterduck specific options
+    parallel_runs_per_node: 6
+    total_runs_per_node: null
+    resources_config:
+      cpu:
+      cuda:
+        gpus: [ 0, 1, 2, 3 ]
+      rendering:
+      stagger:
+        delay: 5
 
 # insert wandb here
 wandb:
@@ -37,7 +58,7 @@ n_layers: 8
 
 d_conv: 4
 n_layer_decoder: 6
-n_layer_encoder: 8
+n_layer_encoder: 4
 
 # mamba_ssm_config:
 mamba_ssm_cfg:
@@ -56,7 +77,7 @@ mamba_ssm_cfg:
 
 # mamba_ssm_config:
 mamba_encoder_cfg:
-  d_state: 16
+  d_state: 8
   d_conv: ${d_conv}
   expand: 2
   dt_rank: "auto"
@@ -71,7 +92,7 @@ mamba_encoder_cfg:
 
 # mamba_ssm_config:
 mamba_decoder_cfg:
-  d_state: 16
+  d_state: 8
   d_conv: ${d_conv}
   expand: 2
   dt_rank: "auto"
@@ -89,7 +110,7 @@ train_batch_size: 1024
 val_batch_size: 1024
 num_workers: 4
 device: 'cuda'
-epoch: 500
+epoch: 300
 eval_every_n_epochs: 50
 scale_data: True
 
@@ -128,6 +149,6 @@ simulation:
   seed: ${seed}
   device: ${device}
   render: False
-  n_cores: 30
+  n_cores: 10
   n_contexts: 60
   n_trajectories_per_context: 8
