@@ -120,7 +120,7 @@ obs_dim: 4
 action_dim: 2
 max_len_data: 200
 
-diff_steps: 16
+diff_steps: 8
 
 window_size: ${add:${obs_seq},3}
 obs_seq: 5
