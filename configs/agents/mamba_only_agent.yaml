@@ -1,8 +1,8 @@
 _target_: agents.oc_ddpm_agent.DiffusionAgent
 _recursive_: false
 
-action_seq_size: ${window_size}
-obs_seq_len: 1
+action_seq_size: ${inference_action_seq}
+obs_seq_len: ${obs_seq}
 
 model:
   _target_: agents.oc_ddpm_agent.DiffusionPolicy
@@ -12,13 +12,13 @@ model:
   device: ${device}
 
   model:
-    _target_: agents.models.oc_ddpm.diffusion_policy.Diffusion
+    _target_: agents.models.mamba.diffusion_policy.Diffusion
     _recursive_: false
 
     state_dim: 256 #${obs_dim}
     action_dim: ${action_dim}
     beta_schedule: 'cosine'
-    n_timesteps: 16
+    n_timesteps: ${diff_steps}
     loss_type: 'l2'
     clip_denoised: true
     predict_epsilon: true
@@ -27,40 +27,30 @@ model:
     diffusion_x_M: 10
 
     model:
-      _target_: agents.models.oc_ddpm.oc_ddpm.DiffusionEncDec
+      _target_: agents.models.mamba.diffusion_mamba.DiffusionMambaOnly
       _recursive_: false
       state_dim: 256 #${obs_dim}
       action_dim: ${action_dim}
       goal_conditioned: False
       goal_seq_len: 10
-      obs_seq_len: 1
-      action_seq_len: ${window_size}
+      obs_seq_len: ${obs_seq}
+      action_seq_len: ${train_action_seq}
       embed_pdrob: 0
       # Architecture details
       embed_dim: 128 #${n_embd}
       device: ${device}
       linear_output: true
 
-      encoder:
-        _target_: agents.models.oc_ddpm.oc_ddpm.TransformerEncoder
-        embed_dim: 128 #${n_embd}
-        n_heads: 4
-        n_layers: 4
-        attn_pdrop: 0.1
-        resid_pdrop: 0.1
-        bias: False
-        block_size: ${add:${window_size}, 1}
-
-      decoder:
-        _target_: agents.models.oc_ddpm.oc_ddpm.TransformerDecoder
-        embed_dim: 128 #${n_embd}
-        cross_embed: 128 #${n_embd} # allow cross embedding to have different dimension
-        n_heads: 4
-        n_layers: 4
-        attn_pdrop: 0.1
-        resid_pdrop: 0.1
-        bias: False
-        block_size: ${add:${window_size}, 1}
+      mamba:
+        _target_: agents.models.mamba.mamba.MixerModel
+        ssm_cfg: ${mamba_ssm_cfg}
+        d_model: 128
+        n_layer: ${n_layers}
+        norm_epsilon: 1e-5
+        rms_norm: False
+        fused_add_norm: False
+        residual_in_fp32: False
+        device: ${device}
 
   obs_encoder:
     _target_: agents.module.vision.multi_image_obs_encoder.MultiImageObsEncoder
@@ -68,11 +58,11 @@ model:
       # acceptable types: rgb, low_dim
       obs:
         agentview_0:
-          shape: [3, 256, 128]
+          shape: [ 3, 256, 128 ]
           type: rgb
     rgb_model:
       _target_: agents.module.vision.get_model.get_resnet
-      input_shape: [3, 256, 128]
+      input_shape: [ 3, 256, 128 ]
       output_size: 128
     resize_shape: null
     #    crop_shape: [ 84, 84 ]
@@ -88,11 +78,11 @@ model:
       # acceptable types: rgb, low_dim
       obs:
         agentview_1:
-          shape: [3, 256, 256]
+          shape: [ 3, 256, 256 ]
           type: rgb
     rgb_model:
       _target_: agents.module.vision.get_model.get_resnet
-      input_shape: [3, 256, 256]
+      input_shape: [ 3, 256, 256 ]
       output_size: 128
     resize_shape: null
     #    crop_shape: [ 84, 84 ]

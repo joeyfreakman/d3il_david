@@ -1,12 +1,13 @@
 defaults:
-  - agents: oc_ddpm_agent
+  - agents: mamba_only_agent
 
-agent_name: oc_ddpm
+agent_name: mamba_only
 log_dir: logs/real_robot_${task_suite}/
 
-train_data_path: /media/alr_admin/Data/atalay/data  # just for dataset init
+train_data_path: /home/temp_store/real_robot_data
+#train_data_path: /media/alr_admin/Data/atalay/data  # just for dataset init
 
-task_suite: pickPlacing  # pickPlacing cupStacking insertion
+task_suite: insertion  # pickPlacing cupStacking insertion
 if_sim: False
 
 # insert wandb here
@@ -34,10 +35,36 @@ n_layer: 4
 n_head: 4
 n_embd: 72
 
+diff_steps: 16
+
+encoder_n_layer: 4
+decoder_n_layer: 4
+
+# mamba parameters
+n_layer_decoder: 10
+n_layer_encoder: 10
+n_layers: 10
+d_conv: 4
+
+# mamba_ssm_config:
+mamba_ssm_cfg:
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  dt_rank: "auto"
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: "random"
+  dt_scale: 1.0
+  dt_init_floor: 1e-4
+  conv_bias: True
+  bias: False
+  use_fast_path: True
+
 # Training
 train_batch_size: 64
 val_batch_size: 256
-num_workers: 4
+num_workers: 1
 device: 'cuda'
 epoch: 100
 eval_every_n_epochs: 10
@@ -47,10 +74,14 @@ scale_data: True
 obs_dim: 10 # not used
 action_dim: 8
 max_len_data: 600
-window_size: 5
 
 action_seq_size: 5
 obs_seq_len: 1
+
+window_size: ${add:${obs_seq},4}
+obs_seq: 1
+train_action_seq: 5
+inference_action_seq: ${train_action_seq}
 
 # Dataset
 trainset:

@@ -42,11 +42,11 @@ class Real_Robot_Dataset(TrajectoryDataset):
         masks = []
 
         if task_suite == "cupStacking":
-            data_dir = Path("/media/alr_admin/Data/atalay/cupstacking")
+            data_dir = Path(data_directory + "/cupstacking")
         elif task_suite == "pickPlacing":
-            data_dir = Path("/media/alr_admin/Data/atalay/banana")
+            data_dir = Path(data_directory + "/banana")
         elif task_suite == "insertion":
-            data_dir = Path("/media/alr_admin/Data/atalay/insertion")
+            data_dir = Path(data_directory + "/insertion")
         else:
             raise ValueError('Wrong name of task suite.')
 
