@@ -94,7 +94,7 @@ train_batch_size: 64
 val_batch_size: 256
 num_workers: 1
 device: 'cuda'
-epoch: 50
+epoch: 100
 eval_every_n_epochs: 10
 scale_data: True
 
@@ -107,7 +107,7 @@ action_seq_size: 5
 obs_seq_len: 1
 
 window_size: ${add:${obs_seq},4}
-obs_seq: 3
+obs_seq: 1
 train_action_seq: 5
 inference_action_seq: ${train_action_seq}
 
