@@ -1,6 +1,6 @@
 defaults:
   - agents: ddpm_mamba_only_agent
-#  - override hydra/launcher: clusterduck_slurm
+  - override hydra/launcher: clusterduck_slurm
 
 agent_name: ddpm_mamba_only
 log_dir: logs/pushing/
@@ -19,36 +19,29 @@ hydra:
   mode: MULTIRUN
   run:
     dir: ${log_dir}/runs/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
-#  job:
-#    chdir: True
+  job:
+    chdir: True
   sweep:
     dir: ${log_dir}/sweeps/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.override_dirname}
-#  launcher:
-#    timeout_min: 600
-#    name: pushing #${hydra.job.name}
-#    partition: accelerated
-#    gres: gpu:4
-#    #    cpus-per-task: 152
-#    #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
-#
-#    # clusterduck specific options
-#    parallel_runs_per_node: 8
-#    total_runs_per_node: null
-#    resources_config:
-#      cpu:
-#      cuda:
-#        gpus: [ 0, 1, 2, 3 ]
-#      rendering:
-#      stagger:
-#        delay: 5
-#  launcher:
-#    timeout_min: 2000
-#    name: pushing #${hydra.job.name}
-#    partition: accelerated
-##    gpus_per_node: 4
-#    additional_parameters: {"ntasks":1, "gres":gpu:4, "cpus-per-task":152}
+  launcher:
+    timeout_min: 600
+    name: pushing #${hydra.job.name}
+    partition: accelerated
+    gres: gpu:4
+    #    cpus-per-task: 152
+    #    additional_parameters: { "ntasks": 1, "gres": gpu:4, "cpus-per-task": 152 }
 
+    # clusterduck specific options
+    parallel_runs_per_node: 4
+    total_runs_per_node: null
+    resources_config:
+      cpu:
+      cuda:
+        gpus: [ 0, 1, 2, 3 ]
+      rendering:
+      stagger:
+        delay: 5
 
 seed: 42
 
@@ -117,8 +110,8 @@ train_batch_size: 1024
 val_batch_size: 1024
 num_workers: 4
 device: 'cuda'
-epoch: 1
-eval_every_n_epochs: 1
+epoch: 200
+eval_every_n_epochs: 50
 scale_data: True
 
 # Environment
@@ -156,6 +149,6 @@ simulation:
   seed: ${seed}
   device: ${device}
   render: False
-  n_cores: 1
-  n_contexts: 1
-  n_trajectories_per_context: 1
+  n_cores: 10
+  n_contexts: 30
+  n_trajectories_per_context: 16
