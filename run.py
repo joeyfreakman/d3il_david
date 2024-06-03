@@ -57,13 +57,14 @@ def main(cfg: DictConfig) -> None:
     # load the model performs best on the evaluation set
     agent.load_pretrained_model(agent.working_dir, sv_name=agent.eval_model_name)
 
-    job_num = hydra.core.hydra_config.HydraConfig.get().job.num
+    # job_num = hydra.core.hydra_config.HydraConfig.get().job.num
+    #
+    # num_cpu = mp.cpu_count()
+    # cpu_set = list(range(num_cpu))
+    # current_num = int(job_num % 8)
+    # assign_cpus = cpu_set[current_num * 10:current_num * 10 + 10]
 
-    num_cpu = mp.cpu_count()
-    cpu_set = list(range(num_cpu))
-    current_num = int(job_num % 8)
-    assign_cpus = cpu_set[current_num * 10:current_num * 10 + 10]
-
+    assign_cpus = [0,1]
     # simulate the model
     env_sim = hydra.utils.instantiate(cfg.simulation)
     env_sim.test_agent(agent, assign_cpus)

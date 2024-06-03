@@ -156,6 +156,6 @@ simulation:
   seed: ${seed}
   device: ${device}
   render: False
-  n_cores: 10
-  n_contexts: 30
-  n_trajectories_per_context: 16
+  n_cores: 1
+  n_contexts: 1
+  n_trajectories_per_context: 1
