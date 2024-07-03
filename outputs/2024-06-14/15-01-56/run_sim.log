@@ -1,0 +1,12 @@
+[2024-06-14 15:01:58,791][agents.models.mamba.diffusion_mamba][INFO] - number of parameters: 1.871368e+06
+[2024-06-14 15:01:58,827][root][INFO] - Loading Real Robot Dataset
+[2024-06-14 15:01:59,219][agents.utils.scaler][INFO] - Datset Info: action min: [-2.02318095 -1.33616856 -2.22784444 -1.75075286 -6.40450854 -1.76543699
+ -2.27183273 -1.40848141] and max: [3.9392936  1.7393854  1.49309902 1.23876762 1.31842613 1.33948321
+ 2.02737741 0.71001323]
+[2024-06-14 15:01:59,219][agents.utils.scaler][INFO] - Training dataset size: target (5505, 8)
+[2024-06-14 15:01:59,220][agents.base_agent][INFO] - The model has a total amount of 24273864 parameters
+[2024-06-14 15:01:59,312][agents.oc_ddpm_agent][INFO] - Loaded pre-trained model parameters
+[2024-06-14 15:02:06,206][simulation.real_robot][INFO] - Starting trained model evaluation on real robot
+[2024-06-14 15:02:13,388][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-14 15:02:20,931][simulation.real_robot][INFO] - Quitting evaluation
+[2024-06-14 15:02:27,700][__main__][INFO] - done

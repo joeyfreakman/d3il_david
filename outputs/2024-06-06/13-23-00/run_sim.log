@@ -1,0 +1,15 @@
+[2024-06-06 13:23:02,472][agents.models.mamba.mamba_cross][INFO] - number of parameters: 2.433160e+06
+[2024-06-06 13:23:02,501][root][INFO] - Loading Real Robot Dataset
+[2024-06-06 13:23:03,229][agents.utils.scaler][INFO] - Datset Info: action min: [-1.73687542 -2.44349092 -2.38153506 -2.91742082 -9.14021515 -2.67824089
+ -1.95283201 -1.23045349] and max: [3.10519479 2.3659718  1.3760266  2.89907722 5.70799555 1.61156906
+ 1.97996073 0.81266176]
+[2024-06-06 13:23:03,229][agents.utils.scaler][INFO] - Training dataset size: target (19253, 8)
+[2024-06-06 13:23:03,231][agents.base_agent][INFO] - The model has a total amount of 24835656 parameters
+[2024-06-06 13:23:03,325][agents.oc_ddpm_agent][INFO] - Loaded pre-trained model parameters
+[2024-06-06 13:23:10,112][simulation.real_robot][INFO] - Starting trained model evaluation on real robot
+[2024-06-06 13:23:39,409][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-06 13:23:39,841][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-06 13:24:43,072][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-06 13:24:43,535][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-06 13:25:12,327][simulation.real_robot][INFO] - Quitting evaluation
+[2024-06-06 13:25:18,972][__main__][INFO] - done

@@ -47,6 +47,10 @@ class Real_Robot_Dataset(TrajectoryDataset):
             data_dir = Path(data_directory + "/banana")
         elif task_suite == "insertion":
             data_dir = Path(data_directory + "/insertion")
+        elif task_suite == "pickbanana":
+            data_dir = Path(data_directory + "/pick_banana")
+        elif task_suite == "pickcarrot":
+            data_dir = Path(data_directory + "/pick_carrot")
         else:
             raise ValueError('Wrong name of task suite.')
 

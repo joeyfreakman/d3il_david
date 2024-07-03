@@ -1,0 +1,19 @@
+[2024-06-05 11:24:21,045][agents.models.oc_ddpm.oc_ddpm][INFO] - number of parameters: 1.884168e+06
+[2024-06-05 11:24:21,113][root][INFO] - Loading Real Robot Dataset
+[2024-06-05 11:24:22,368][agents.utils.scaler][INFO] - Datset Info: action min: [-4.46586508 -2.32646595 -5.45890439 -3.09741634 -1.08773755 -1.87666885
+ -1.84110276 -0.90522749] and max: [4.30162961 2.02786345 4.13409715 7.38962699 1.42014704 2.18918825
+ 1.40930849 1.10480589]
+[2024-06-05 11:24:22,368][agents.utils.scaler][INFO] - Training dataset size: target (24967, 8)
+[2024-06-05 11:24:22,369][agents.base_agent][INFO] - The model has a total amount of 24286664 parameters
+[2024-06-05 11:24:22,446][agents.oc_ddpm_agent][INFO] - Loaded pre-trained model parameters
+[2024-06-05 11:24:29,208][simulation.real_robot][INFO] - Starting trained model evaluation on real robot
+[2024-06-05 11:25:19,343][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 11:25:19,879][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 11:26:59,812][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 11:27:00,358][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 11:27:43,969][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 11:27:44,552][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 11:29:18,412][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 11:29:19,064][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 11:30:19,264][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 11:30:19,864][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.

@@ -19,7 +19,8 @@ OmegaConf.register_new_resolver(
 torch.cuda.empty_cache()
 
 
-@hydra.main(config_path="configs", config_name="real_robot_config.yaml")
+# @hydra.main(config_path="/home/alr_admin/atalay/d3il_david/logs/real_robot_pickPlacing/sweeps/oc_ddpm/2024-06-02/22-52-33/task_suite=pickPlacing/.hydra", config_name="config.yaml")
+@hydra.main(config_path="/home/alr_admin/atalay/d3il_david/weights/6_6/task_suite=cupStacking/.hydra", config_name="config.yaml")
 def main(cfg: DictConfig) -> None:
 
     np.random.seed(cfg.seed)
@@ -38,7 +39,7 @@ def main(cfg: DictConfig) -> None:
     cfg.task_suite = 'cupStacking'
     cfg.if_sim = True
     agent = hydra.utils.instantiate(cfg.agents)
-    agent.load_pretrained_model("/home/alr_admin/atalay/d3il/weights/cupStacking/ddpm_53data_100epoch",
+    agent.load_pretrained_model("/home/alr_admin/atalay/d3il_david/weights/6_6/task_suite=cupStacking",
                                 sv_name='last_ddpm.pth')
 
     env_sim = hydra.utils.instantiate(cfg.simulation)

@@ -1,0 +1,50 @@
+[2024-06-05 17:19:52,574][agents.models.mamba.mamba_cross][INFO] - number of parameters: 2.432648e+06
+[2024-06-05 17:19:52,610][root][INFO] - Loading Real Robot Dataset
+[2024-06-05 17:19:53,903][agents.utils.scaler][INFO] - Datset Info: action min: [-4.46586508 -2.32646595 -5.45890439 -3.09741634 -1.08773755 -1.87666885
+ -1.84110276 -0.90522749] and max: [4.30162961 2.02786345 4.13409715 7.38962699 1.42014704 2.18918825
+ 1.40930849 1.10480589]
+[2024-06-05 17:19:53,903][agents.utils.scaler][INFO] - Training dataset size: target (24967, 8)
+[2024-06-05 17:19:53,904][agents.base_agent][INFO] - The model has a total amount of 24835144 parameters
+[2024-06-05 17:19:53,988][agents.oc_ddpm_agent][INFO] - Loaded pre-trained model parameters
+[2024-06-05 17:20:00,789][simulation.real_robot][INFO] - Starting trained model evaluation on real robot
+[2024-06-05 17:22:07,935][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:22:08,346][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:23:55,252][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:23:55,803][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:24:54,109][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:24:54,493][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:27:10,700][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:27:11,325][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:29:13,408][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:29:13,947][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:30:00,215][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:30:00,796][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:31:17,112][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:31:17,520][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:32:10,846][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:32:11,322][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:33:09,912][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:33:10,335][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:34:59,943][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:35:00,460][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:35:54,496][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:35:55,018][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:37:06,475][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:37:06,940][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:44:00,952][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:44:01,455][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:45:27,998][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:45:28,493][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:46:20,135][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:46:20,573][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:47:13,498][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:47:14,013][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:48:46,438][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:48:46,975][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:50:19,004][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:50:19,548][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:52:31,610][simulation.real_robot][INFO] - Evaluation done. Resetting robots
+[2024-06-05 17:52:32,206][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:52:44,323][simulation.real_robot][INFO] - Quitting evaluation
+[2024-06-05 17:52:44,418][polymetis.robot_interface][WARNING] - The specified 'time_to_go' might not be large enough to ensure accurate movement.
+[2024-06-05 17:52:50,968][__main__][INFO] - done

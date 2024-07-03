@@ -1,13 +1,15 @@
 defaults:
   - agents: mamba_cross_agent
+#  - agents: mamba_only_agent
 
 agent_name: mamba_cross
+#agent_name: mamba_only
 log_dir: logs/real_robot_${task_suite}/
 
-train_data_path: /home/temp_store/real_robot_data
-#train_data_path: /media/alr_admin/Data/atalay/data  # just for dataset init
+#train_data_path: /home/temp_store/real_robot_data
+train_data_path: /media/alr_admin/Data/atalay  # just for dataset init
 
-task_suite: insertion  # pickPlacing cupStacking insertion
+task_suite: cupStacking  # pickPlacing cupStacking insertion
 if_sim: False
 
 # insert wandb here
@@ -41,7 +43,7 @@ encoder_n_layer: 4
 decoder_n_layer: 4
 
 # mamba parameters
-n_layer_decoder: 6
+n_layer_decoder: 10
 n_layer_encoder: 10
 n_layers: 10
 d_conv: 2
@@ -63,7 +65,7 @@ mamba_ssm_cfg:
 
 mamba_encoder_cfg:
   d_state: 16
-  d_conv: ${d_conv}
+  d_conv: 4 #${d_conv}
   expand: 2
   dt_rank: "auto"
   dt_min: 0.001
@@ -77,7 +79,7 @@ mamba_encoder_cfg:
 
 mamba_decoder_cfg:
   d_state: 16
-  d_conv: ${d_conv}
+  d_conv: 2 #${d_conv}
   expand: 2
   dt_rank: "auto"
   dt_min: 0.001

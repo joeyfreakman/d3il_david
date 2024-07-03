@@ -1,0 +1,220 @@
+agents:
+  _target_: agents.oc_ddpm_agent.DiffusionAgent
+  _recursive_: false
+  action_seq_size: ${inference_action_seq}
+  obs_seq_len: ${obs_seq}
+  model:
+    _target_: agents.oc_ddpm_agent.DiffusionPolicy
+    _recursive_: false
+    visual_input: true
+    device: ${device}
+    model:
+      _target_: agents.models.oc_ddpm.diffusion_policy.Diffusion
+      _recursive_: false
+      state_dim: 256
+      action_dim: ${action_dim}
+      beta_schedule: cosine
+      n_timesteps: ${diff_steps}
+      loss_type: l2
+      clip_denoised: true
+      predict_epsilon: true
+      device: ${device}
+      diffusion_x: false
+      diffusion_x_M: 10
+      model:
+        _target_: agents.models.mamba.mamba_cross.DiffusionMambaCross
+        _recursive_: false
+        state_dim: 256
+        action_dim: ${action_dim}
+        goal_conditioned: false
+        goal_seq_len: 10
+        obs_seq_len: ${obs_seq}
+        action_seq_len: ${train_action_seq}
+        embed_pdrob: 0
+        embed_dim: 128
+        device: ${device}
+        linear_output: true
+        encoder:
+          _target_: agents.models.mamba.mamba.MixerModel
+          ssm_cfg: ${mamba_encoder_cfg}
+          d_model: 128
+          n_layer: ${n_layer_encoder}
+          norm_epsilon: 1.0e-05
+          rms_norm: false
+          fused_add_norm: false
+          residual_in_fp32: false
+          device: ${device}
+        mamba:
+          _target_: agents.models.mamba.mamba.MixerModel
+          ssm_cfg: ${mamba_decoder_cfg}
+          d_model: 128
+          n_layer: ${n_layer_decoder}
+          norm_epsilon: 1.0e-05
+          rms_norm: false
+          fused_add_norm: false
+          residual_in_fp32: false
+          device: ${device}
+    obs_encoder:
+      _target_: agents.module.vision.multi_image_obs_encoder.MultiImageObsEncoder
+      shape_meta:
+        obs:
+          agentview_0:
+            shape:
+            - 3
+            - 256
+            - 128
+            type: rgb
+      rgb_model:
+        _target_: agents.module.vision.get_model.get_resnet
+        input_shape:
+        - 3
+        - 256
+        - 128
+        output_size: 128
+      resize_shape: null
+      random_crop: false
+      use_group_norm: true
+      share_rgb_model: false
+      imagenet_norm: true
+    obs_encoder_:
+      _target_: agents.module.vision.multi_image_obs_encoder.MultiImageObsEncoder
+      shape_meta:
+        obs:
+          agentview_1:
+            shape:
+            - 3
+            - 256
+            - 256
+            type: rgb
+      rgb_model:
+        _target_: agents.module.vision.get_model.get_resnet
+        input_shape:
+        - 3
+        - 256
+        - 256
+        output_size: 128
+      resize_shape: null
+      random_crop: false
+      use_group_norm: true
+      share_rgb_model: false
+      imagenet_norm: true
+  optimization:
+    _target_: torch.optim.Adam
+    lr: 0.0005
+    weight_decay: 0
+  trainset: ${trainset}
+  valset: ${valset}
+  train_batch_size: ${train_batch_size}
+  val_batch_size: ${val_batch_size}
+  num_workers: ${num_workers}
+  epoch: ${epoch}
+  device: ${device}
+  scale_data: ${scale_data}
+  eval_every_n_epochs: ${eval_every_n_epochs}
+  discount: 0.99
+  use_ema: true
+  decay: 0.995
+  update_ema_every_n_steps: 1
+  goal_window_size: 1
+  window_size: ${window_size}
+  diffusion_kde: false
+  diffusion_kde_samples: 100
+  goal_conditioned: false
+agent_name: mamba_cross
+log_dir: logs/real_robot_${task_suite}/
+train_data_path: /media/alr_admin/Data/atalay
+task_suite: cupStacking
+if_sim: false
+wandb:
+  entity: atalaydonat
+  project: d3il
+group: ${task_suite}_${agent_name}
+seed: 42
+hidden_dim: 128
+num_hidden_layers: 6
+n_layer: 4
+n_head: 4
+n_embd: 72
+diff_steps: 8
+encoder_n_layer: 4
+decoder_n_layer: 4
+n_layer_decoder: 6
+n_layer_encoder: 10
+n_layers: 10
+d_conv: 2
+mamba_ssm_cfg:
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  dt_rank: auto
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: random
+  dt_scale: 1.0
+  dt_init_floor: 0.0001
+  conv_bias: true
+  bias: false
+  use_fast_path: true
+mamba_encoder_cfg:
+  d_state: 16
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: auto
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: random
+  dt_scale: 1.0
+  dt_init_floor: 0.0001
+  conv_bias: true
+  bias: false
+  use_fast_path: true
+mamba_decoder_cfg:
+  d_state: 16
+  d_conv: ${d_conv}
+  expand: 2
+  dt_rank: auto
+  dt_min: 0.001
+  dt_max: 0.1
+  dt_init: random
+  dt_scale: 1.0
+  dt_init_floor: 0.0001
+  conv_bias: true
+  bias: false
+  use_fast_path: true
+train_batch_size: 64
+val_batch_size: 256
+num_workers: 1
+device: cuda
+epoch: 100
+eval_every_n_epochs: 10
+scale_data: true
+obs_dim: 10
+action_dim: 8
+max_len_data: 600
+action_seq_size: 5
+obs_seq_len: 1
+window_size: ${add:${obs_seq},4}
+obs_seq: 1
+train_action_seq: 5
+inference_action_seq: ${train_action_seq}
+trainset:
+  _target_: environments.dataset.real_robot_dataset.Real_Robot_Dataset
+  data_directory: ${train_data_path}
+  task_suite: ${task_suite}
+  obs_dim: ${obs_dim}
+  action_dim: ${action_dim}
+  max_len_data: ${max_len_data}
+  window_size: ${window_size}
+  if_sim: ${if_sim}
+valset:
+  _target_: environments.dataset.real_robot_dataset.Real_Robot_Dataset
+  data_directory: ${train_data_path}
+  task_suite: ${task_suite}
+  obs_dim: ${obs_dim}
+  action_dim: ${action_dim}
+  max_len_data: ${max_len_data}
+  window_size: ${window_size}
+  if_sim: ${if_sim}
+simulation:
+  _target_: simulation.real_robot.RealRobot
+  device: ${device}
