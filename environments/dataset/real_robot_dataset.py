@@ -1,5 +1,5 @@
 import logging
-from environments.dataset.base_dataset import TrajectoryDataset
+from src.d3il_david.environments.dataset.base_dataset import TrajectoryDataset
 import os
 from pathlib import Path
 import cv2

@@ -11,10 +11,9 @@ import numpy as np
 from tqdm import tqdm
 import wandb
 import einops
-from sklearn.neighbors import KernelDensity
 
-from agents.base_agent import BaseAgent
-from agents.models.oc_ddpm.ema import ExponentialMovingAverage
+from src.d3il_david.agents.base_agent import BaseAgent
+from src.d3il_david.agents.models.oc_ddpm.ema import ExponentialMovingAverage
 
 # A logger for this file
 log = logging.getLogger(__name__)

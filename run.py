@@ -27,7 +27,7 @@ def set_seed_everywhere(seed):
     random.seed(seed)
 
 
-@hydra.main(config_path="configs", config_name="real_robot_config.yaml")
+@hydra.main(config_path="configs", config_name="aloha_robot_config.yaml",version_base=None)
 def main(cfg: DictConfig) -> None:
 
     # if cfg.seed in [0, 1]:
@@ -52,7 +52,7 @@ def main(cfg: DictConfig) -> None:
 
     agent = hydra.utils.instantiate(cfg.agents)
     # train the agent
-    agent.train_vision_agent()
+    agent.train_agent()
 
     # load the model performs best on the evaluation set
     # agent.load_pretrained_model(agent.working_dir, sv_name=agent.eval_model_name)

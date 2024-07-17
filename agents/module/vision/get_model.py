@@ -1,7 +1,7 @@
 import torch
 import torchvision
 from typing import List, Callable
-from agents.models.robomimic.models.obs_core import VisualCore
+from src.d3il_david.agents.models.robomimic.models.obs_core import VisualCore
 
 
 def get_resnet(input_shape: List[int], output_size: int):

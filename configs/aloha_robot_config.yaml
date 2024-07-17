@@ -1,0 +1,83 @@
+defaults:
+  - agents: aloha_image_robot_agent
+#  - agents: mamba_only_agent
+
+agent_name: aloha_image_robot_agent
+#agent_name: mamba_only
+log_dir: logs/aloha_robot_${task_name}/
+
+#train_data_path: /home/temp_store/real_robot_data
+train_data_path: /mnt/d/kit/ALR/dataset/ttp_compressed  # just for dataset init
+
+task_name: task1  # pickPlacing cupStacking insertion
+
+# insert wandb here
+wandb:
+  entity: joeywang-of
+  project: ttp_david
+
+group: ${task_name}_${agent_name}
+
+hydra:
+  run:
+    dir: ${log_dir}/runs/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${log_dir}/sweeps/${agent_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.override_dirname}
+
+seed: 42
+
+# Network
+hidden_dim: 128
+num_hidden_layers: 6
+
+# transformer
+n_layer: 4
+n_head: 4
+n_embd: 72
+
+diff_steps: 8
+
+encoder_n_layer: 4
+decoder_n_layer: 4
+
+# Training
+train_batch_size: 4
+val_batch_size: 4
+num_workers: 4
+device: 'cuda'
+epoch: 100
+eval_every_n_epochs: 10
+scale_data: True
+
+# Environment
+obs_dim: 14 # not used
+action_dim: 14
+max_len_data: 750
+
+action_seq_size: 5
+obs_seq_len: 1
+
+window_size: ${add:${obs_seq},4}
+obs_seq: 1
+train_action_seq: 5
+inference_action_seq: ${train_action_seq}
+
+# Dataset
+trainset:
+  _target_: environments.dataset.aloha_image_dataset.Aloha_Image_dataset
+  data_directory: ${train_data_path}
+  task_name: ${task_name}
+  obs_dim: ${obs_dim}
+  action_dim: ${action_dim}
+  max_len_data: ${max_len_data}
+  window_size: ${window_size}
+
+valset:
+  _target_: environments.dataset.aloha_image_dataset.Aloha_Image_dataset
+  data_directory: ${train_data_path}
+  task_name: ${task_name}
+  obs_dim: ${obs_dim}
+  action_dim: ${action_dim}
+  max_len_data: ${max_len_data}
+  window_size: ${window_size}

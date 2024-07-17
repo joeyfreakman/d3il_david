@@ -7,8 +7,9 @@ from omegaconf import DictConfig
 import hydra
 
 import wandb
+import torch.utils.data
 
-from agents.utils.scaler import Scaler
+from src.d3il_david.agents.utils.scaler import Scaler
 
 # A logger for this file
 log = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class BaseAgent(abc.ABC):
         self.model = hydra.utils.instantiate(model).to(device)
 
         self.trainset = hydra.utils.instantiate(trainset)
-        # self.valset = hydra.utils.instantiate(valset)
+        self.valset = hydra.utils.instantiate(valset)
 
         self.train_dataloader = torch.utils.data.DataLoader(
             self.trainset,
@@ -44,14 +45,14 @@ class BaseAgent(abc.ABC):
             prefetch_factor=10
         )
 
-        # self.test_dataloader = torch.utils.data.DataLoader(
-        #     self.valset,
-        #     batch_size=val_batch_size,
-        #     shuffle=False,
-        #     num_workers=num_workers,
-        #     pin_memory=True,
-        #     prefetch_factor=10
-        # )
+        self.test_dataloader = torch.utils.data.DataLoader(
+            self.valset,
+            batch_size=val_batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=True,
+            prefetch_factor=10
+        )
 
         self.eval_every_n_epochs = eval_every_n_epochs
 
@@ -74,10 +75,10 @@ class BaseAgent(abc.ABC):
 
     def train(self):
 
-        if self.model.visual_input:
-            self.train_vision_agent()
-        else:
-            self.train_agent()
+        # if self.model.visual_input:
+        #     self.train_vision_agent()
+        # else:
+        self.train_agent()
             
     @abc.abstractmethod
     def train_agent(self):
