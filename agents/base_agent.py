@@ -75,10 +75,10 @@ class BaseAgent(abc.ABC):
 
     def train(self):
 
-        # if self.model.visual_input:
-        #     self.train_vision_agent()
-        # else:
-        self.train_agent()
+        if self.model.visual_input:
+            self.train_vision_agent()
+        else:
+            self.train_agent()
             
     @abc.abstractmethod
     def train_agent(self):

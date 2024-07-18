@@ -21,9 +21,10 @@ class DiffusionPolicy(nn.Module):
     def __init__(self, 
                  model: DictConfig, 
                  obs_encoder: DictConfig,
+                 visual_input: bool = False,
                  device: str = "cpu"):
         super(DiffusionPolicy, self).__init__()
-
+        self.visual_input = visual_input
         self.camera_names = ['cam_high' , 'cam_left_wrist','cam_low', 'cam_right_wrist']
         self.obs_encoder = hydra.utils.instantiate(obs_encoder).to(device)
         self.model = hydra.utils.instantiate(model).to(device)
@@ -129,15 +130,42 @@ class AlohaImageDDPMAgent(BaseAgent):
 
         self.obs_context = deque(maxlen=self.obs_seq_len)
         self.goal_context = deque(maxlen=self.goal_window_size)
-        self.camera_names = ['cam_high', 'cam_low', 'cam_left_wrist', 'cam_right_wrist']
+        self.camera_names = ['cam_high', 'cam_left_wrist','cam_low',  'cam_right_wrist']
         self.image_contexts = {cam: deque(maxlen=self.obs_seq_len) for cam in self.camera_names}
+    
+    def train_vision_agent(self):
+
+        for num_epoch in tqdm(range(self.epoch)):
+            
+            train_loss = []
+
+            for idx,data in enumerate(self.train_dataloader):
+                
+                images, action = data
+                for cam in self.camera_names:
+                    images[cam] = images[cam].to(self.device).float()
+                   
+                images = {cam:images[cam][:,:self.obs_seq_len, :, :, :].contiguous() for cam in self.camera_names}
+                action = self.scaler.scale_output(action)
+                action = action[:,self.obs_seq_len-1:, :].contiguous()
+
+                batch_loss = self.train_step(images, action)
+                train_loss.append(batch_loss)
+                
+
+                wandb.log({"train_loss": batch_loss})
+            log.info("Epoch {}: Mean train loss is {}".format(num_epoch, batch_loss))
+
+        log.info("training done")
+        self.store_model_weights(self.working_dir, sv_name=self.last_model_name)
 
     def train_agent(self):
+        best_test_mse = 1e10
 
         for num_epoch in tqdm(range(self.epoch)):
             if not (num_epoch+1) % self.eval_every_n_epochs:
                 test_mse = []
-                for idx, data in enumerate(self.test_dataloade):
+                for data in self.test_dataloader:
                     images, action = data
                     mean_mse = self.evaluate(images, action)
                     test_mse.append(mean_mse)
@@ -148,17 +176,12 @@ class AlohaImageDDPMAgent(BaseAgent):
                     best_test_mse = avrg_test_mse
                     self.store_model_weights(self.working_dir, sv_name=self.eval_model_name)
 
-                    wandb.log(
-                        {
-                            "best_model_epochs": num_epoch
-                        }
-                    )
-
+                    wandb.log({"best_model_epochs": num_epoch})
                     log.info('New best test loss. Stored weights have been updated!')
 
             train_loss = []
-            for idx, data in enumerate(self.train_dataloader):
-                images,action = data
+            for data in self.train_dataloader:
+                images, action = data
                 batch_loss = self.train_step(images, action)
                 train_loss.append(batch_loss)
 
@@ -167,30 +190,34 @@ class AlohaImageDDPMAgent(BaseAgent):
         self.store_model_weights(self.working_dir, sv_name=self.last_model_name)
         log.info("Training done!")
 
-    def train_step(self, images: dict, action: torch.Tensor) -> float:
+    def train_step(self, images: dict, action: torch.Tensor, goal: Optional[torch.Tensor] = None) -> float:
         self.model.train()
 
-        # process image data
+        # if goal is not None:
+        #     goal = self.scaler.scale_input(goal)
         for cam in self.camera_names:
-            images[cam] = images[cam].to(self.device).float() / 255.0
-
+            images[cam] = images[cam].to(self.device).float() 
+        
         action = action.to(self.device).float()
 
-        # make sure to only use obs_seq_len length of observations
-        for cam in self.camera_names:
-            images[cam] = images[cam][:, :self.obs_seq_len]
-
-        action = action[:, self.obs_seq_len-1:]
         state = images
 
         # compute loss
-        loss = self.model(state, None, action=action, if_train=True)
+        
+        loss = self.model(state, goal, action=action, if_train=True)
+        
 
         # backpropagate
+        
         self.optimizer.zero_grad()
         loss.backward()
-        self.optimizer.step()
+        
 
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+
+        
+        self.optimizer.step()
+        
         self.steps += 1
 
         if self.steps % self.update_ema_every_n_steps == 0:
@@ -199,20 +226,12 @@ class AlohaImageDDPMAgent(BaseAgent):
         return loss.item()
 
     @torch.no_grad()
-    def evaluate(self, images: dict, action: torch.Tensor) -> float:
-        # process image data
+    def evaluate(self, images: dict, action: torch.Tensor, goal: Optional[torch.Tensor] = None) -> float:
         for cam in self.camera_names:
-            images[cam] = images[cam].to(self.device).float() / 255.0
-
+            images[cam] = images[cam].to(self.device).float()
         
         action = action.to(self.device).float()
-
-        # makes sure to only use obs_seq_len length of observations
-        for cam in self.camera_names:
-            images[cam] = images[cam][:, :self.obs_seq_len]
-        
-        action = action[:, self.obs_seq_len-1:]
-
+        action = self.scaler.scale_output(action)
         state = images
 
         if self.use_ema:
@@ -220,8 +239,7 @@ class AlohaImageDDPMAgent(BaseAgent):
             self.ema_helper.copy_to(self.model.parameters())
 
         self.model.eval()
-
-        loss = self.model.loss(action, state, None)
+        loss = self.model.loss(action, state, goal)
 
         if self.use_ema:
             self.ema_helper.restore(self.model.parameters())
@@ -237,15 +255,10 @@ class AlohaImageDDPMAgent(BaseAgent):
         for cam in self.camera_names:
             self.image_contexts[cam].clear()
         
-        # If you're using action_context, reset it too
-        if hasattr(self, 'action_context'):
-            self.action_context.clear()
-
     @torch.no_grad()
-    def predict(self, state: tuple, goal: Optional[torch.Tensor] = None, extra_args=None) -> torch.Tensor:
-        images= state
+    def predict(self, state: dict, goal: Optional[torch.Tensor] = None, extra_args=None) -> torch.Tensor:
+        images = state
 
-        # process image data
         for cam in self.camera_names:
             img = torch.from_numpy(images[cam]).to(self.device).float().unsqueeze(0) / 255.0
             self.image_contexts[cam].append(img)
@@ -258,11 +271,8 @@ class AlohaImageDDPMAgent(BaseAgent):
                 self.ema_helper.copy_to(self.model.parameters())
 
             self.model.eval()
-
             input_images = {cam: torch.cat(list(self.image_contexts[cam]), dim=1) for cam in self.camera_names}
-            
             input_state = input_images
-
             model_pred = self.model(input_state, goal)
 
             if self.use_ema:
@@ -273,3 +283,28 @@ class AlohaImageDDPMAgent(BaseAgent):
         next_action = self.curr_action_seq[:, self.action_counter, :]
         self.action_counter += 1
         return next_action.detach().cpu().numpy()
+    
+    @torch.no_grad()
+    def load_pretrained_model(self, weights_path: str, sv_name=None, **kwargs) -> None:
+        """
+        Method to load a pretrained model weights inside self.model
+        """
+        self.model.load_state_dict(torch.load(os.path.join(weights_path, sv_name)))
+        self.ema_helper = ExponentialMovingAverage(self.model.parameters(), self.decay, self.device)
+        log.info('Loaded pre-trained model parameters')
+
+    @torch.no_grad()
+    def store_model_weights(self, store_path: str, sv_name=None) -> None:
+        """
+        Store the model weights inside the store path as model_weights.pth
+        """
+        if self.use_ema:
+            self.ema_helper.store(self.model.parameters())
+            self.ema_helper.copy_to(self.model.parameters())
+        # torch.save(self.model.state_dict(), os.path.join(store_path, "model_state_dict.pth"))
+        torch.save(self.model.state_dict(), os.path.join(store_path, sv_name))
+        if self.use_ema:
+            self.ema_helper.restore(self.model.parameters())
+        torch.save(self.model.state_dict(), os.path.join(store_path, "non_ema_model_state_dict.pth"))
+
+    

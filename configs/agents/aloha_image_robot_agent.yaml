@@ -7,6 +7,9 @@ obs_seq_len: 1
 model:
   _target_: agents.aloha_image_ddpm_agent.DiffusionPolicy
   _recursive_: false
+  
+  visual_input: True
+  device: ${device}
 
   model:
     _target_: agents.models.oc_ddpm.diffusion_policy.Diffusion
@@ -91,7 +94,7 @@ model:
 
 optimization:
   _target_: torch.optim.Adam
-  lr: 5e-4 # for transformer
+  lr: 1e-4 # for transformer
 #  lr: 5e-4 # for MLP
   weight_decay: 0
 

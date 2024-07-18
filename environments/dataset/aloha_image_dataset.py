@@ -19,7 +19,7 @@ class Aloha_Image_dataset(TrajectoryDataset):
             obs_dim:14,
             action_dim:14,
             max_len_data: int = 750,
-            device="cpu",
+            device="cuda",
             window_size: int = 1,
     ):
         task_config = TASK_CONFIGS[task_name]
@@ -112,20 +112,23 @@ class Aloha_Image_dataset(TrajectoryDataset):
 #         obs_dim=14,
 #         action_dim=14,
 #         max_len_data=750,
-#         device="cpu",
+#         device="cuda",
 #         window_size=1,
 #     )
 
 #     train_data_loader = torch.utils.data.DataLoader(dataset=dataset,
 #                                                     batch_size=1,
 #                                                     shuffle=True,
-#                                                     num_workers=0,
-#                                                     pin_memory=False,
+#                                                     num_workers=4,
+#                                                     pin_memory=True,
+#                                                     prefetch_factor=10
 #                                                     )
 #     try:
 #         for idx, data in enumerate(train_data_loader):
-#             images, action, mask = data
+#             images, action = data
 #             print(f"Batch {idx}: images shape: {images['cam_high'].shape}, action shape: {action.shape}")
+#             print(action)
+            
             
 #     except Exception as e:
 #         print(f"Error occurred: {e}")
