@@ -44,7 +44,7 @@ decoder_n_layer: 4
 # Training
 train_batch_size: 1
 val_batch_size: 1
-num_workers: 4
+num_workers: 25
 device: 'cuda'
 epoch: 100
 eval_every_n_epochs: 10
@@ -55,12 +55,12 @@ obs_dim: 14 # not used
 action_dim: 14
 max_len_data: 750
 
-action_seq_size: 5
-obs_seq_len: 1
+action_seq_size: 8
+obs_seq_len: 2
 
-window_size: ${add:${obs_seq},4}
-obs_seq: 1
-train_action_seq: 5
+window_size: 16
+obs_seq: 2
+train_action_seq: 4
 inference_action_seq: ${train_action_seq}
 
 # Dataset
@@ -72,6 +72,7 @@ trainset:
   action_dim: ${action_dim}
   max_len_data: ${max_len_data}
   window_size: ${window_size}
+  obs_seq_len: ${obs_seq_len} 
 
 valset:
   _target_: environments.dataset.aloha_image_dataset.Aloha_Image_dataset
@@ -81,3 +82,4 @@ valset:
   action_dim: ${action_dim}
   max_len_data: ${max_len_data}
   window_size: ${window_size}
+  obs_seq_len: ${obs_seq_len}
