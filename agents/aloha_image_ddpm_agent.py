@@ -21,12 +21,14 @@ class DiffusionPolicy(nn.Module):
     def __init__(self, 
                  model: DictConfig, 
                  obs_encoder: DictConfig,
+                 obs_encoder_: DictConfig,
                  visual_input: bool = False,
                  device: str = "cpu"):
         super(DiffusionPolicy, self).__init__()
         self.visual_input = visual_input
         self.camera_names = ['cam_high' , 'cam_left_wrist','cam_low', 'cam_right_wrist']
         self.obs_encoder = hydra.utils.instantiate(obs_encoder).to(device)
+        self.obs_encoder_ = hydra.utils.instantiate(obs_encoder_).to(device)
         self.model = hydra.utils.instantiate(model).to(device)
 
     def forward(self, inputs, goal, action=None, if_train=False):
@@ -42,7 +44,9 @@ class DiffusionPolicy(nn.Module):
         
         
         # Encode the observations using the encoder
-        obs = self.obs_encoder(obs_dict)
+        obs1 = self.obs_encoder(obs_dict)
+        obs2 = self.obs_encoder_(obs_dict)
+        obs = torch.cat([obs1, obs2], dim=-1)
         obs = obs.view(B, T, -1)
 
         if if_train:
@@ -81,7 +85,7 @@ class AlohaImageDDPMAgent(BaseAgent):
             diffusion_kde: bool = False,
             diffusion_kde_samples: int = 100,
             goal_conditioned: bool = False,
-            eval_every_n_epochs: int = 50
+            eval_every_n_epochs: int = 10
     ):
         super().__init__(model, trainset=trainset, valset=valset, train_batch_size=train_batch_size,
                          val_batch_size=val_batch_size, num_workers=num_workers, device=device,

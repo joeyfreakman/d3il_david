@@ -90,13 +90,42 @@ model:
     use_group_norm: True
     share_rgb_model: True
     imagenet_norm: True
+  
+  obs_encoder_:
+    _target_: agents.module.vision.multi_image_obs_encoder.MultiImageObsEncoder
+    shape_meta: # &shape_meta
+      # acceptable types: rgb, low_dim
+      obs:
+        cam_high:
+          shape: [3, 480, 640]
+          type: rgb
+        cam_left_wrist:
+          shape: [3, 480, 640]
+          type: rgb
+        cam_low:
+          shape: [3, 480, 640]
+          type: rgb
+        cam_right_wrist:
+          shape: [3, 480, 640]
+          type: rgb
+    rgb_model:
+      _target_: agents.module.vision.get_model.get_resnet
+      input_shape: [3, 480, 640]
+      output_size: 64
+    resize_shape: null
+    #    crop_shape: [ 84, 84 ]
+    # constant center crop
+    random_crop: False
+    use_group_norm: True
+    share_rgb_model: False
+    imagenet_norm: True
 
 
 optimization:
   _target_: torch.optim.Adam
   lr: 1e-4 # for transformer
 #  lr: 5e-4 # for MLP
-  weight_decay: 0
+  weight_decay: 1e-6
 
 
 trainset: ${trainset}
