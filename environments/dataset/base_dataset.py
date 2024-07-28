@@ -21,6 +21,7 @@ class TrajectoryDataset(Dataset, abc.ABC):
             action_dim: int = 2,
             max_len_data: int = 256,
             window_size: int = 1,
+            obs_seq_len: int = 2,
     ):
 
         self.data_directory = data_directory
@@ -29,6 +30,7 @@ class TrajectoryDataset(Dataset, abc.ABC):
         self.max_len_data = max_len_data
         self.action_dim = action_dim
         self.obs_dim = obs_dim
+        self.obs_seq_len = obs_seq_len
 
         self.window_size = window_size
 
