@@ -70,15 +70,6 @@ model:
         cam_high:
           shape: [3, 480, 640]
           type: rgb
-        cam_left_wrist:
-          shape: [3, 480, 640]
-          type: rgb
-        cam_low:
-          shape: [3, 480, 640]
-          type: rgb
-        cam_right_wrist:
-          shape: [3, 480, 640]
-          type: rgb
     rgb_model:
       _target_: agents.module.vision.get_model.get_resnet
       input_shape: [3, 480, 640]
@@ -96,9 +87,6 @@ model:
     shape_meta: # &shape_meta
       # acceptable types: rgb, low_dim
       obs:
-        cam_high:
-          shape: [3, 480, 640]
-          type: rgb
         cam_left_wrist:
           shape: [3, 480, 640]
           type: rgb
