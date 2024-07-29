@@ -21,7 +21,7 @@ class TrajectoryDataset(Dataset, abc.ABC):
             action_dim: int = 2,
             max_len_data: int = 256,
             window_size: int = 1,
-            obs_seq_len: int = 2,
+            obs_seq_len: int = 1,
     ):
 
         self.data_directory = data_directory
