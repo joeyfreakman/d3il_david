@@ -7,9 +7,13 @@ agent_name: aloha_image_robot_agent
 log_dir: logs/aloha_robot_${task_name}/
 
 #train_data_path: /home/temp_store/real_robot_data
-train_data_path: /mnt/d/kit/ALR/dataset/ttp_compressed  # just for dataset init
-
+train_data_path: ${oc.env:TMPDIR}/pfs/work7/workspace/scratch/utfvv-ttp/dataset_longtask  # just for dataset init
 task_name: task1  # pickPlacing cupStacking insertion
+
+#checkpoint
+load_checkpoint: False  # Set to true when you want to load a checkpoint
+checkpoint_dir: "/home/kit/stud/utfvv/Teaching_to_pack/src/d3il_david/ckpt"
+checkpoint_name: "model_epoch_90.pth" 
 
 # insert wandb here
 wandb:
@@ -42,9 +46,9 @@ encoder_n_layer: 4
 decoder_n_layer: 4
 
 # Training
-train_batch_size: 1
-val_batch_size: 1
-num_workers: 6
+train_batch_size: 8
+val_batch_size: 8
+num_workers: 20
 device: 'cuda'
 epoch: 100
 eval_every_n_epochs: 10
@@ -83,3 +87,7 @@ valset:
   max_len_data: ${max_len_data}
   window_size: ${window_size}
   obs_seq_len: ${obs_seq_len}
+
+# real robot
+save_episode: True
+onscreen_render: true
