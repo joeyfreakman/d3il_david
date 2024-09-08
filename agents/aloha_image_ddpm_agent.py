@@ -138,7 +138,7 @@ class AlohaImageDDPMAgent(BaseAgent):
         self.image_contexts = {cam: deque(maxlen=self.obs_seq_len) for cam in self.camera_names}
     
     def train_vision_agent(self):
-
+        best_train_loss = 1e10
         for num_epoch in tqdm(range(self.epoch)):
             
             train_loss = []
@@ -158,7 +158,18 @@ class AlohaImageDDPMAgent(BaseAgent):
                 
 
                 wandb.log({"train_loss": batch_loss})
+            epoch_loss = sum(train_loss) / len(train_loss)
             log.info("Epoch {}: Mean train loss is {}".format(num_epoch, batch_loss))
+
+            if epoch_loss < best_train_loss:
+                best_train_loss = epoch_loss
+                self.store_model_weights(self.working_dir, sv_name=self.eval_model_name)
+                log.info('New best train loss. Stored weights have been updated!')
+
+            # Save the model every N epochs
+            if (num_epoch + 1) % self.eval_every_n_epochs == 0:
+                self.store_model_weights(self.working_dir, sv_name=f"model_epoch_{num_epoch+1}.pth")
+                log.info(f'Saved model checkpoint at epoch {num_epoch+1}')
 
         log.info("training done")
         self.store_model_weights(self.working_dir, sv_name=self.last_model_name)
@@ -262,10 +273,16 @@ class AlohaImageDDPMAgent(BaseAgent):
     @torch.no_grad()
     def predict(self, state: dict, goal: Optional[torch.Tensor] = None, extra_args=None) -> torch.Tensor:
         images = state
-
         for cam in self.camera_names:
-            img = torch.from_numpy(images[cam]).to(self.device).float().unsqueeze(0) / 255.0
+            img = torch.from_numpy(images[cam]).to(self.device).float()
+            if img.dim() == 3:  # If the image is (C, H, W)
+                img = img.unsqueeze(0).unsqueeze(0)  # Add batch and time dimensions
+            elif img.dim() == 4:  # If the image is (T, C, H, W)
+                img = img.unsqueeze(0)  # Add only batch dimension
             self.image_contexts[cam].append(img)
+        # for cam in self.camera_names:
+        #     img = torch.from_numpy(images[cam]).to(self.device).float().unsqueeze(0)
+        #     self.image_contexts[cam].append(img)
 
         if self.action_counter == self.action_seq_size:
             self.action_counter = 0
